@@ -1,0 +1,6 @@
+#!/bin/sh
+# Run this to set configure.in up for an API version.
+
+DEBUG_SAFEHANDLES="-define:DEBUG_SAFEHANDLES"
+
+. ./bootstrap-2.12 "$@"

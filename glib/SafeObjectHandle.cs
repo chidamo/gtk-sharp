@@ -24,6 +24,9 @@ using Microsoft.Win32.SafeHandles;
 
 namespace GLib
 {
+#if DEBUG_SAFEHANDLES
+	public
+#endif
 	class SafeObjectHandle : SafeHandleZeroOrMinusOneIsInvalid
 	{
 		public static SafeObjectHandle Zero = new SafeObjectHandle ();
@@ -34,10 +37,14 @@ namespace GLib
 		{
 		}
 
-		SafeObjectHandle (IntPtr handle) : base(true)
+		protected SafeObjectHandle (IntPtr handle) : base (true)
 		{
 			SetHandle (handle);
 		}
+
+#if DEBUG_SAFEHANDLES
+		public static Func<IntPtr, SafeObjectHandle> InternalCreateHandle = ptr => new SafeObjectHandle (ptr);
+#endif
 
 		static readonly Dictionary<IntPtr, ToggleRef> Objects = new Dictionary<IntPtr, ToggleRef> (IntPtrEqualityComparer.Instance);
 
@@ -46,9 +53,12 @@ namespace GLib
 			if (handle == IntPtr.Zero)
 				return Zero;
 
-			var safeHandle = new SafeObjectHandle (handle) {
-				tref = new ToggleRef (obj, handle)
-			};
+#if DEBUG_SAFEHANDLES
+			var safeHandle = InternalCreateHandle (handle);
+#else
+			var safeHandle = new SafeObjectHandle (handle);
+#endif
+			safeHandle.tref = new ToggleRef (obj, handle);
 
 			lock (Objects)
 				Objects [handle] = safeHandle.tref;
