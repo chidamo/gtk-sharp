@@ -48,7 +48,11 @@ namespace GLib
 			if (handle == IntPtr.Zero)
 				return Zero;
 
-			var safeHandle = InternalCreateHandle?.Invoke (handle) ?? new SafeObjectHandle (handle);
+			SafeObjectHandle safeHandle;
+			if (InternalCreateHandle != null)
+				safeHandle = InternalCreateHandle.Invoke (handle);
+			else
+				safeHandle = new SafeObjectHandle (handle);
 			safeHandle.tref = new ToggleRef (obj, handle);
 
 			lock (Objects)
