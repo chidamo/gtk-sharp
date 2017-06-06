@@ -68,9 +68,9 @@ namespace GLib
 
 			lock (Objects)
 				ret = Objects.TryGetValue (o, out tr);
-			
+
 			obj = ret ? tr.Target : null;
-			return ret;
+			return obj != null;
 		}
 
 		static List<ToggleRef> PendingDestroys = new List<ToggleRef> ();
